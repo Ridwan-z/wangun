@@ -1,0 +1,442 @@
+/* ===== EDITOR — mobile-first ===== */
+
+.editor-view {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  /* padding-top (bukan margin) untuk ruang navbar — kebal margin-collapse */
+  padding-top: 64px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Viewport terang: sage muda (senada ground plane) melebur ke cream
+     (senada sidebar) + grid blueprint halus ber-base terang */
+  background:
+    linear-gradient(rgba(79, 124, 172, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 124, 172, 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, #e9efe4 0%, #f2efe6 55%, #f6f1e8 100%);
+  background-size:
+    24px 24px,
+    24px 24px,
+    100% 100%;
+}
+
+.editor-view canvas {
+  display: block;
+}
+
+/* ===== SIDEBAR — bottom sheet drawer di mobile ===== */
+
+.editor-sidebar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  max-height: 62vh;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  background:
+    linear-gradient(rgba(79, 124, 172, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 124, 172, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  background-size:
+    24px 24px,
+    24px 24px,
+    100% 100%;
+  border-top: 1px solid rgba(79, 124, 172, 0.3);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -14px 34px -12px rgba(5, 10, 18, 0.55);
+  transform: translateY(105%);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 111, 74, 0.45) transparent;
+}
+
+.editor-sidebar.open {
+  transform: translateY(0);
+}
+
+.editor-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.editor-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(201, 111, 74, 0.4);
+  border-radius: 999px;
+}
+
+.editor-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 111, 74, 0.65);
+}
+
+/* Tombol toggle drawer — hanya tampil di layar sempit */
+.sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  cursor: pointer;
+  color: var(--amber);
+  background: rgba(232, 160, 76, 0.14);
+  border: 1px solid rgba(232, 160, 76, 0.45);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.sidebar-toggle svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
+.sidebar-toggle:active {
+  transform: scale(0.92);
+}
+
+/* ===== HEADER — bar tipis di atas (di bawah navbar 64px) ===== */
+
+.editor-header {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  color: #f2f5f9;
+  background: linear-gradient(103deg, rgba(16, 28, 46, 0.94) 0%, rgba(11, 17, 28, 0.9) 100%);
+  border-bottom: 1px solid rgba(122, 168, 214, 0.3);
+  box-shadow: 0 8px 20px -12px rgba(5, 10, 18, 0.8);
+  overflow: visible;
+}
+
+.editor-title-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  flex: 1;
+}
+
+.editor-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--amber);
+  background: linear-gradient(160deg, rgba(232, 160, 76, 0.18), rgba(232, 160, 76, 0.05));
+  border: 1px solid rgba(232, 160, 76, 0.45);
+}
+
+.editor-mark .section-mark {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.editor-header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.back-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  color: rgba(233, 238, 245, 0.85);
+  background: rgba(8, 13, 22, 0.55);
+  border: 1px solid rgba(122, 168, 214, 0.35);
+  border-radius: 999px;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.18s ease;
+}
+
+.back-btn-icon {
+  width: 12px;
+  height: 12px;
+  display: block;
+}
+
+.back-btn:hover {
+  color: #fff;
+  border-color: var(--amber);
+  background: rgba(232, 160, 76, 0.14);
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 16px -8px rgba(232, 160, 76, 0.55),
+    0 0 0 1px rgba(232, 160, 76, 0.2);
+}
+
+/* ===== STATS — strip tipis di bawah header ===== */
+
+.editor-stats {
+  position: absolute;
+  top: 116px;
+  left: 8px;
+  right: 8px;
+  bottom: auto;
+  z-index: 15;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 10.5px;
+  max-height: 92px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.editor-stats::-webkit-scrollbar {
+  display: none;
+}
+
+.editor-stats p {
+  margin: 2px 0;
+}
+
+/* ===== PANEL AKSI SELEKSI ===== */
+
+.editor-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rotate-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.rotate-btn {
+  flex: 1;
+  padding: 9px 10px;
+  background: #27AE60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.rotate-btn:hover {
+  background: #1E8449;
+}
+
+.mode-btn {
+  padding: 10px 20px;
+  background: #27AE60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.mode-btn:hover {
+  background: #1E8449;
+}
+
+.remove-btn {
+  padding: 9px 20px;
+  background: #E74C3C;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.remove-btn:hover {
+  background: #C0392B;
+}
+
+.piece-selected-hint {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #B7950B;
+}
+
+.piece-remove-btn {
+  background: #F1C40F;
+  color: #212121;
+}
+
+.piece-remove-btn:hover {
+  background: #D4AC0D;
+}
+
+.collision-warning {
+  color: #E74C3C;
+  font-weight: 600;
+  animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ===== DESKTOP (>=768px) — layout seperti sebelumnya ===== */
+
+@media (min-width: 768px) {
+  .editor-view {
+    flex-direction: row;
+  }
+
+  .editor-sidebar {
+    position: static;
+    width: 270px;
+    max-height: calc(100vh - 64px);
+    flex-shrink: 0;
+    transform: none;
+    transition: none;
+    border-top: none;
+    border-right: 1px solid rgba(79, 124, 172, 0.22);
+    border-radius: 0;
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .sidebar-toggle {
+    display: none;
+  }
+
+  /* Header kembali jadi kartu overlay di kiri-atas canvas (64 navbar + 22) */
+  .editor-header {
+    top: 86px;
+    left: 294px;
+    right: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 18px 14px 14px;
+    border-radius: 14px;
+    border-bottom: 1px solid rgba(122, 168, 214, 0.3);
+    box-shadow:
+      inset 0 1px 0 rgba(232, 160, 76, 0.28),
+      0 14px 30px -14px rgba(5, 10, 18, 0.8);
+    backdrop-filter: blur(6px);
+  }
+
+  .editor-title-row {
+    gap: 11px;
+  }
+
+  .editor-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    box-shadow: 0 0 14px rgba(232, 160, 76, 0.2);
+  }
+
+  .editor-mark .section-mark {
+    width: 20px;
+    height: 20px;
+  }
+
+  .editor-header h1 {
+    font-size: 17px;
+    letter-spacing: 0.12em;
+  }
+
+  .back-btn {
+    padding: 7px 15px;
+    font-size: 12px;
+    gap: 7px;
+  }
+
+  .back-btn-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Stats kembali jadi kartu overlay kanan-bawah kiri */
+  .editor-stats {
+    top: auto;
+    bottom: 20px;
+    left: 294px;
+    right: auto;
+    padding: 15px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    max-height: none;
+    max-width: 500px;
+  }
+
+  .editor-stats p {
+    margin: 5px 0;
+  }
+
+  /* Panel aksi kembali ke pojok kanan-bawah */
+  .editor-controls {
+    left: auto;
+    right: 20px;
+    bottom: 20px;
+    min-width: 200px;
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .rotate-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .remove-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .piece-selected-hint {
+    font-size: 13px;
+  }
+}

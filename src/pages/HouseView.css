@@ -1,0 +1,636 @@
+/* ===== Landing "Impian Rumah" — tema Arsitek Studio ===== */
+
+.landing {
+  /* padding-top (bukan margin) untuk ruang navbar — kebal margin-collapse
+     yang menyisakan strip putih 64px di bawah halaman */
+  height: 100vh;
+  padding-top: 64px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--paper);
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 111, 74, 0.45) transparent;
+}
+
+.landing::-webkit-scrollbar {
+  width: 6px;
+}
+
+.landing::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.landing::-webkit-scrollbar-thumb {
+  background: rgba(201, 111, 74, 0.4);
+  border-radius: 999px;
+}
+
+.landing-container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ===== 1. HERO ===== */
+
+.landing-hero {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  color: #f2f5f9;
+  background: linear-gradient(103deg, var(--bp-navy) 0%, var(--bp-navy-2) 58%, var(--bp-charcoal) 100%);
+  border-bottom: 1px solid rgba(122, 168, 214, 0.25);
+  box-shadow: inset 0 -2px 0 rgba(232, 160, 76, 0.4);
+  overflow: hidden;
+}
+
+/* Grid blueprint dua skala — background murni (tanpa mask-image) agar
+   selalu terpint penuh saat scroll cepat/anchor, tidak ada area kosong */
+.landing-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(122, 168, 214, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 168, 214, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(122, 168, 214, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 168, 214, 0.05) 1px, transparent 1px);
+  background-size:
+    96px 96px,
+    96px 96px,
+    24px 24px,
+    24px 24px;
+  opacity: 0.55;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  width: 100%;
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+.hero-copy {
+  max-width: 620px;
+}
+
+.hero-kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 18px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 5.2vw, 62px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px 0;
+}
+
+.hero-accent {
+  color: var(--amber);
+  position: relative;
+  white-space: nowrap;
+}
+
+.hero-accent::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--amber) 0%, var(--terracotta) 100%);
+  opacity: 0.55;
+  border-radius: 999px;
+}
+
+.hero-sub {
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: rgba(233, 238, 245, 0.78);
+  margin: 0 0 30px 0;
+  max-width: 520px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* Dekorasi: rumah blueprint dengan orbit dashed */
+.hero-deco {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--amber);
+}
+
+.hero-deco > svg {
+  width: 170px;
+  height: 170px;
+  filter: drop-shadow(0 0 24px rgba(232, 160, 76, 0.35));
+}
+
+.hero-orbit {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(122, 168, 214, 0.45);
+  border-radius: 50%;
+  animation: orbit-spin 46s linear infinite;
+}
+
+.hero-orbit-2 {
+  inset: 38px;
+  border-color: rgba(232, 160, 76, 0.35);
+  animation-duration: 30s;
+  animation-direction: reverse;
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Tombol ===== */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
+  border: 1px solid rgba(255, 214, 165, 0.55);
+  color: #1d1206;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  box-shadow:
+    0 12px 26px -12px rgba(232, 160, 76, 0.65),
+    inset 0 1px 0 rgba(255, 235, 205, 0.5);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.22s ease,
+    filter 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 16px 32px -12px rgba(232, 160, 76, 0.75),
+    inset 0 1px 0 rgba(255, 235, 205, 0.5);
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 26px;
+  border-radius: 999px;
+  border: 1px dashed rgba(122, 168, 214, 0.55);
+  color: rgba(233, 238, 245, 0.85);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.18s ease,
+    color 0.2s ease;
+}
+
+.btn-ghost:hover {
+  color: #fff;
+  border-color: var(--amber);
+  background: rgba(232, 160, 76, 0.1);
+  transform: translateY(-1px);
+}
+
+/* ===== Head section umum ===== */
+
+.landing-section-head {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.section-kicker {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  margin: 0 0 12px 0;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 36px);
+  font-weight: 700;
+  color: var(--bp-navy-2);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.section-rule {
+  display: block;
+  width: 72px;
+  height: 3px;
+  margin: 18px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--amber) 0%, var(--terracotta) 100%);
+}
+
+/* ===== 2. FITUR ===== */
+
+.landing-features {
+  padding: 90px 0;
+  background:
+    linear-gradient(rgba(79, 124, 172, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 124, 172, 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  background-size:
+    24px 24px,
+    24px 24px,
+    100% 100%;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.feature-card {
+  background: rgba(255, 253, 248, 0.85);
+  border: 1px solid rgba(79, 124, 172, 0.18);
+  border-radius: 14px;
+  padding: 26px 22px;
+  transition:
+    transform 0.18s ease,
+    border-color 0.2s ease,
+    box-shadow 0.22s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--amber);
+  box-shadow:
+    0 18px 34px -18px rgba(201, 111, 74, 0.5),
+    0 0 0 1px rgba(232, 160, 76, 0.22);
+}
+
+.feature-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+  color: #3d648c;
+  background: rgba(79, 124, 172, 0.1);
+  border: 1px solid rgba(79, 124, 172, 0.18);
+  margin-bottom: 16px;
+  transition: inherit;
+}
+
+.feature-icon svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+.feature-card:hover .feature-icon {
+  color: var(--amber-deep);
+  background: rgba(232, 160, 76, 0.14);
+  border-color: rgba(232, 160, 76, 0.4);
+}
+
+.feature-card h3 {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--bp-navy-2);
+  margin: 0 0 9px 0;
+}
+
+.feature-card p {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ===== 3. PREVIEW 3D ===== */
+
+.landing-preview {
+  padding: 90px 0;
+  background:
+    linear-gradient(rgba(79, 124, 172, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 124, 172, 0.055) 1px, transparent 1px),
+    var(--paper);
+  background-size:
+    24px 24px,
+    24px 24px,
+    100% 100%;
+  border-top: 1px dashed rgba(79, 124, 172, 0.35);
+  border-bottom: 1px dashed rgba(79, 124, 172, 0.35);
+}
+
+.preview-frame {
+  position: relative;
+  height: clamp(380px, 62vh, 620px);
+  border-radius: 18px;
+  overflow: hidden;
+  /* Senada langit scene — transien apapun tidak akan tampak putih/gelap */
+  background: #d9e6f2;
+  /* Kunci cat ke dalam frame: canvas tidak bisa "bocor" keluar border */
+  contain: paint;
+  isolation: isolate;
+  border: 1px solid rgba(122, 168, 214, 0.35);
+  box-shadow:
+    inset 0 0 0 1px rgba(11, 17, 28, 0.4),
+    0 24px 48px -24px rgba(38, 48, 62, 0.55);
+}
+
+/* Host khusus canvas: dipatok penuh ke frame + compositor layer sendiri
+   agar canvas tidak pernah dirender ulang sebagai blok putih saat scroll.
+   CATATAN: jangan pakai selector `.preview-frame > div` universal — akan
+   menangkap .preview-card juga dan melarangkan kartu menutupi viewport. */
+.preview-canvas-host {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.preview-canvas-host > div {
+  width: 100%;
+  height: 100%;
+}
+
+.preview-frame canvas {
+  display: block;
+}
+
+/* Card info di dalam viewport — pindahan dari overlay lama */
+.preview-card {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 5;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: #f2f5f9;
+  background: linear-gradient(103deg, rgba(16, 28, 46, 0.94) 0%, rgba(11, 17, 28, 0.92) 100%);
+  border: 1px solid rgba(122, 168, 214, 0.3);
+  /* backdrop-filter sengaja tidak dipakai: di atas canvas WebGL dalam
+     container scroll, blur ini memicu blok putih saat halaman discroll */
+  box-shadow:
+    inset 0 1px 0 rgba(232, 160, 76, 0.28),
+    0 12px 26px -14px rgba(5, 10, 18, 0.8);
+  pointer-events: none;
+}
+
+.preview-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.preview-mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: var(--amber);
+  background: linear-gradient(160deg, rgba(232, 160, 76, 0.18), rgba(232, 160, 76, 0.05));
+  border: 1px solid rgba(232, 160, 76, 0.45);
+}
+
+.preview-mark .logo-mark {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.preview-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.preview-sub {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  color: rgba(233, 238, 245, 0.78);
+}
+
+.preview-count {
+  display: inline-block;
+  min-width: 22px;
+  text-align: center;
+  margin-left: 4px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  color: #1d1206;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
+}
+
+.preview-hint {
+  position: absolute;
+  bottom: 14px;
+  right: 18px;
+  z-index: 5;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: rgba(233, 238, 245, 0.8);
+  background: rgba(11, 17, 28, 0.65);
+  border: 1px dashed rgba(122, 168, 214, 0.4);
+  pointer-events: none;
+}
+
+/* ===== 4. CTA PENUTUP ===== */
+
+.landing-cta {
+  padding: 100px 0;
+  color: #f2f5f9;
+  text-align: center;
+  background: linear-gradient(103deg, var(--bp-navy) 0%, var(--bp-navy-2) 58%, var(--bp-charcoal) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(122, 168, 214, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 168, 214, 0.09) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.5;
+}
+
+.cta-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.8vw, 42px);
+  font-weight: 700;
+  margin: 0 0 14px 0;
+}
+
+.cta-sub {
+  font-size: 15.5px;
+  color: rgba(233, 238, 245, 0.75);
+  margin: 0 0 32px 0;
+}
+
+.cta-inner .section-kicker {
+  color: var(--amber);
+}
+
+.btn-large {
+  padding: 16px 34px;
+  font-size: 16px;
+}
+
+/* ===== FOOTER ===== */
+
+.landing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  background: var(--bp-charcoal);
+  border-top: 1px solid rgba(122, 168, 214, 0.2);
+}
+
+.footer-credit {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--amber);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 960px) {
+  .hero-inner {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 30px;
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-deco {
+    width: 200px;
+    height: 200px;
+  }
+
+  .hero-deco > svg {
+    width: 110px;
+    height: 110px;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .landing-features,
+  .landing-preview,
+  .landing-cta {
+    padding: 64px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-container {
+    padding: 0 20px;
+  }
+
+  .hero-title {
+    font-size: clamp(30px, 9vw, 38px);
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .hero-deco {
+    display: none;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-frame {
+    height: 340px;
+  }
+
+  .preview-card {
+    padding: 11px 13px;
+  }
+
+  .preview-hint {
+    display: none;
+  }
+}

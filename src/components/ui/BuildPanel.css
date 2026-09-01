@@ -1,0 +1,142 @@
+/* ===== Card "Bangun Rumah" — alat gambar teknik ===== */
+
+.build-panel h3 {
+  margin: 0 0 12px 0;
+}
+
+.build-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.build-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 6px 10px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(79, 124, 172, 0.16);
+  border-radius: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    transform 0.18s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.build-glyph {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: #3d648c;
+  background: rgba(79, 124, 172, 0.1);
+  border: 1px solid rgba(79, 124, 172, 0.16);
+  margin-bottom: 2px;
+  transition: inherit;
+}
+
+.build-glyph svg {
+  width: 19px;
+  height: 19px;
+  display: block;
+}
+
+.build-tool:hover {
+  transform: translateY(-2px);
+  border-color: var(--amber);
+  background: #fffaef;
+  box-shadow:
+    0 8px 18px -8px rgba(201, 111, 74, 0.45),
+    0 0 0 1px rgba(232, 160, 76, 0.25);
+}
+
+.build-tool:hover .build-glyph {
+  color: var(--amber-deep);
+  background: rgba(232, 160, 76, 0.14);
+  border-color: rgba(232, 160, 76, 0.4);
+}
+
+.build-tool.active {
+  border-color: var(--terracotta);
+  background: linear-gradient(180deg, #fff4e2 0%, #fdead6 100%);
+  box-shadow:
+    0 6px 16px -8px rgba(201, 111, 74, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.build-tool.active .build-glyph {
+  color: var(--terracotta);
+  background: rgba(201, 111, 74, 0.14);
+  border-color: rgba(201, 111, 74, 0.45);
+}
+
+.build-tool.active span,
+.build-tool.active small {
+  color: #7a3d1e;
+}
+
+.build-tool span {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+/* Dimensi & anotasi teknis: monospace */
+.build-tool small {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+  line-height: 1.3;
+}
+
+.build-footer {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px dashed rgba(79, 124, 172, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.build-rotate {
+  padding: 9px;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
+  border: 1px solid rgba(255, 214, 165, 0.55);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #1d1206;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.18s ease,
+    filter 0.2s ease;
+}
+
+.build-rotate:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px -6px rgba(232, 160, 76, 0.6);
+}
+
+.build-hint {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+}
