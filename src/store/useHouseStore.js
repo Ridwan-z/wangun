@@ -11,6 +11,10 @@ import {
   canRemovePiece,
   wallHitsFurniture,
 } from '../utils/buildHelper';
+import {
+  isRoofPlacementValid,
+  roofPieceBaseY,
+} from '../utils/roofHelper';
 import { clampToPlotBounds, getCatalogSizeByType } from '../utils/boundsHelper';
 
 export const useHouseStore = create(
@@ -18,10 +22,11 @@ export const useHouseStore = create(
     (set, get) => ({
       furnitureItems: [],
 
-      // Piece bangunan: lantai & tembok hasil bongkar pasang
+      // Piece bangunan: lantai, tembok & atap hasil bongkar pasang
       buildPieces: generateDefaultFloor(),
 
-      addPiece: (kind, size, rotation, position) => {
+      // kind: 'floor' | 'wall' | 'roof'
+      addPiece: (kind, size, rotation, position, model = null) => {
         const fp = pieceFootprint(kind, size, rotation);
         const snapped = [position[0], 0, position[2]];
 
@@ -50,6 +55,16 @@ export const useHouseStore = create(
             return false;
         }
 
+        // Atap: wajib di atas cell ber-tembok (tembok acak pun valid),
+        // dan satu cell hanya boleh ditumpangi satu piece atap
+        let baseY = 0;
+        if (kind === 'roof') {
+          if (!isRoofPlacementValid(snapped, fp, pieces)) return false;
+          if (collidesWithPieces(snapped, kind, size, rotation, pieces))
+            return false;
+          baseY = roofPieceBaseY(snapped, fp, pieces);
+        }
+
         const piece = {
           id: `piece-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           kind,
@@ -58,6 +73,10 @@ export const useHouseStore = create(
           position: snapped,
         };
         if (kind === 'wall') piece.level = level;
+        if (kind === 'roof') {
+          piece.model = model;
+          piece.baseY = baseY;
+        }
         set((state) => ({
           buildPieces: [...state.buildPieces, piece],
         }));
@@ -102,8 +121,7 @@ export const useHouseStore = create(
       },
 
       // Clamp semua furniture tetap di dalam area bangun
-      reclampFurniture: () => {
-        const { furnitureItems } = get();
+      reclampFurniture: () => {        const { furnitureItems } = get();
         set({
           furnitureItems: furnitureItems.map((item) => {
             const size = getCatalogSizeByType(item.type);
@@ -111,6 +129,15 @@ export const useHouseStore = create(
             const [cx, cz] = clampToPlotBounds(x, z, size[0] / 2, size[2] / 2);
             return { ...item, position: [cx, 0, cz] };
           }),
+        });
+      },
+
+      // Kembalikan semua ke kondisi default: furniture dikosongkan,
+      // piece bangunan diganti lantai 8x8 ubin standar
+      resetToDefault: () => {
+        set({
+          furnitureItems: [],
+          buildPieces: generateDefaultFloor(),
         });
       },
     }),
@@ -133,6 +160,10 @@ export const useHouseStore = create(
         const merged = { ...current, ...persisted };
         if (!Array.isArray(merged.buildPieces)) {
           merged.buildPieces = generateDefaultFloor();
+        }
+        // Data versi lama (atap utuh otomatis) tidak kompatibel — buang
+        if (Array.isArray(merged.roofs)) {
+          delete merged.roofs;
         }
         return merged;
       },

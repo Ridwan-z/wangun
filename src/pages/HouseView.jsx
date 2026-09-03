@@ -70,6 +70,8 @@ function PreviewCanvas() {
 
 export function HouseView() {
   const furnitureItems = useHouseStore((state) => state.furnitureItems);
+  const buildPieces = useHouseStore((state) => state.buildPieces);
+  const roofCount = buildPieces.filter((p) => p.kind === 'roof').length;
 
   const features = [
     {
@@ -168,6 +170,9 @@ export function HouseView() {
               </div>
               <p className="preview-sub">
                 Total furniture: <span className="preview-count">{furnitureItems.length}</span>
+              </p>
+              <p className="preview-sub">
+                Atap: <span className="preview-count">{roofCount} piece</span>
               </p>
             </div>
             <p className="preview-hint">seret untuk memutar &bull; scroll untuk zoom</p>

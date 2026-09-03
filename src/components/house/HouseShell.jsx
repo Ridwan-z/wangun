@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useRef } from 'react';
 import {
   TILE_SIZE,
   TILE_LONG_LENGTH,
@@ -8,26 +8,8 @@ import {
 } from '../../data/houseConfig';
 import { useHouseStore } from '../../store/useHouseStore';
 import { wallLevel, wallBaseY } from '../../utils/buildHelper';
-
-// Penanda piece (tembok/lantai) terpilih: warna sama dengan highlight
-// seleksi furniture (#FFD700) agar perbedaannya jelas terlihat
-const PIECE_SELECTED_COLOR = '#FFD700';
-const PIECE_SELECTED_INTENSITY = 0.35;
-
-function usePieceHighlight(materialRef, isSelected) {
-  useEffect(() => {
-    const mat = materialRef.current;
-    if (!mat) return;
-
-    if (isSelected) {
-      mat.emissive.set(PIECE_SELECTED_COLOR);
-      mat.emissiveIntensity = PIECE_SELECTED_INTENSITY;
-    } else {
-      mat.emissive.set('#000000');
-      mat.emissiveIntensity = 1;
-    }
-  }, [materialRef, isSelected]);
-}
+import { usePieceHighlight } from '../../utils/usePieceHighlight';
+import { RoofPiece, buildRoofPieceGeometry } from './RoofPiece';
 
 function FloorPiece({
   piece,
@@ -144,6 +126,10 @@ export function HouseShell({
     () => buildPieces.filter((p) => p.kind === 'wall'),
     [buildPieces]
   );
+  const roofPieces = useMemo(
+    () => buildPieces.filter((p) => p.kind === 'roof'),
+    [buildPieces]
+  );
 
   return (
     <group>
@@ -171,6 +157,20 @@ export function HouseShell({
       {/* Tembok terpasang */}
       {wallPieces.map((piece) => (
         <WallPiece
+          key={piece.id}
+          piece={piece}
+          editable={editable}
+          selectable={selectable}
+          allowPieceContextMenu={allowPieceContextMenu}
+          isSelected={selectedPieceId === piece.id}
+          onSelect={onSelectPiece}
+          onRemove={onRemovePiece || removePiece}
+        />
+      ))}
+
+      {/* Atap terpasang (piece modular, pola sama dengan tembok) */}
+      {roofPieces.map((piece) => (
+        <RoofPiece
           key={piece.id}
           piece={piece}
           editable={editable}

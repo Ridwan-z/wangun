@@ -146,3 +146,37 @@ const buildIcons = {
 export function BuildGlyph({ kind }) {
   return buildIcons[kind] || buildIcons.floor;
 }
+
+// ===== Ikon model piece atap — siluet profil tiap bentuk =====
+const roofIcons = {
+  datar: (
+    <svg {...base}>
+      <rect x="3.5" y="8.5" width="17" height="3" rx="0.8" />
+      <path d="M5.5 11.5V19h13v-7.5" />
+      <path d="M9 15.5h6" opacity="0.55" />
+    </svg>
+  ),
+  kiri: (
+    <svg {...base}>
+      <path d="M3.5 16.5 20.5 8v8.5z" />
+      <path d="M2.5 18.5h19" opacity="0.55" />
+    </svg>
+  ),
+  kanan: (
+    <svg {...base}>
+      <path d="M20.5 16.5 3.5 8v8.5z" />
+      <path d="M2.5 18.5h19" opacity="0.55" />
+    </svg>
+  ),
+  limas: (
+    <svg {...base}>
+      <path d="M3.5 18.5v-4.5L20.5 8v10.5z" />
+      <path d="M12 16.3v-5.6" opacity="0.55" />
+      <path d="M2.5 20.5h19" opacity="0.55" />
+    </svg>
+  ),
+};
+
+export function RoofGlyph({ model }) {
+  return roofIcons[model] || roofIcons.datar;
+}

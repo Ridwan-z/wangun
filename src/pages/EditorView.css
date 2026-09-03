@@ -194,6 +194,176 @@
   display: block;
 }
 
+/* Tombol reset ke default — aksi destruktif: nuansa merah */
+.reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  color: rgba(244, 214, 208, 0.9);
+  background: rgba(64, 12, 8, 0.5);
+  border: 1px solid rgba(216, 106, 88, 0.45);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.18s ease;
+}
+
+.reset-btn-icon {
+  width: 12px;
+  height: 12px;
+  display: block;
+}
+
+.reset-btn:hover {
+  color: #fff;
+  border-color: var(--terracotta);
+  background: rgba(201, 111, 74, 0.22);
+  box-shadow: 0 4px 12px -4px rgba(201, 111, 74, 0.6);
+  transform: translateY(-1px);
+}
+
+.reset-btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== Modal konfirmasi (reset) ===== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5, 10, 18, 0.55);
+  backdrop-filter: blur(3px);
+  animation: modal-fade 0.18s ease both;
+}
+
+.modal-card {
+  width: min(400px, 100%);
+  padding: 26px 24px 22px;
+  text-align: center;
+  background:
+    linear-gradient(rgba(79, 124, 172, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 124, 172, 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  background-size: 24px 24px, 24px 24px, 100% 100%;
+  border: 1px solid rgba(79, 124, 172, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px -18px rgba(5, 10, 18, 0.65);
+  animation: modal-pop 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.modal-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  color: #7a3d1e;
+  background: linear-gradient(160deg, rgba(232, 160, 76, 0.25), rgba(201, 111, 74, 0.2));
+  border: 1px solid rgba(201, 111, 74, 0.5);
+}
+
+.modal-icon svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+.modal-card h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+
+.modal-card p {
+  margin: 0 0 18px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-btn-ghost,
+.modal-btn-danger {
+  padding: 9px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.modal-btn-ghost {
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(79, 124, 172, 0.3);
+}
+
+.modal-btn-ghost:hover {
+  color: var(--ink);
+  border-color: rgba(79, 124, 172, 0.6);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.modal-btn-danger {
+  color: #1d1206;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
+  border: 1px solid rgba(255, 214, 165, 0.55);
+}
+
+.modal-btn-danger:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 6px 16px -6px rgba(201, 111, 74, 0.7);
+  transform: translateY(-1px);
+}
+
+.modal-btn-ghost:active,
+.modal-btn-danger:active {
+  transform: scale(0.97);
+}
+
+@keyframes modal-fade {
+  from { opacity: 0; }
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+}
+
 .back-btn:hover {
   color: #fff;
   border-color: var(--amber);
@@ -395,6 +565,17 @@
   }
 
   .back-btn-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .reset-btn {
+    padding: 7px 15px;
+    font-size: 12px;
+    gap: 7px;
+  }
+
+  .reset-btn-icon {
     width: 14px;
     height: 14px;
   }

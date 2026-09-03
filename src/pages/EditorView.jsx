@@ -1,10 +1,11 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Suspense, useState, useRef, useEffect } from 'react';
+import { Suspense, useState, useRef, useEffect, useMemo } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { HouseShell } from '../components/house/HouseShell';
 import { SceneLighting } from '../components/house/SceneLighting';
+import { buildRoofPieceGeometry } from '../components/house/RoofPiece';
 import { FurniturePicker } from '../components/ui/FurniturePicker';
-import { BuildPanel, getBuildTool } from '../components/ui/BuildPanel';
+import { BuildPanel, getBuildTool, getRoofTool } from '../components/ui/BuildPanel';
 import { PencilMark } from '../components/ui/BlueprintIcons';
 import { FurnitureItemInteractive } from '../components/furniture/FurnitureItemInteractive';
 import { FurnitureModel } from '../components/furniture/FurnitureModel';
@@ -19,6 +20,10 @@ import {
 import { useHouseStore } from '../store/useHouseStore';
 import { clampToPlotBounds, getCatalogSizeByType } from '../utils/boundsHelper';
 import {
+  isRoofPlacementValid,
+  roofPieceBaseY,
+} from '../utils/roofHelper';
+import {
   willCollideWithOthers,
   collidesWithWalls,
   collidesWithPieces,
@@ -29,11 +34,46 @@ import {
 } from '../utils/buildHelper';
 import './EditorView.css';
 
+// Ghost piece atap: bentuk asli model mengikuti kursor — arah lereng
+// langsung terlihat; biru saat valid, merah saat cell tanpa tembok
+function RoofGhost({ ghost }) {
+  const geometry = useMemo(
+    () => buildRoofPieceGeometry(ghost.model, ghost.size),
+    [ghost.model, ghost.size]
+  );
+
+  useEffect(() => {
+    return () => geometry.dispose();
+  }, [geometry]);
+
+  return (
+    <mesh
+      geometry={geometry}
+      position={[ghost.x, ghost.baseY, ghost.z]}
+      rotation={[0, ghost.rotation === 'v' ? Math.PI / 2 : 0, 0]}
+    >
+      <meshBasicMaterial
+        color={ghost.valid ? '#4FC3F7' : '#E74C3C'}
+        transparent
+        opacity={0.45}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
 function GhostPreview({ ghost }) {
   if (!ghost) return null;
   const tool = getBuildTool(ghost.tool);
-  const fp = pieceFootprint(tool.kind, tool.size, ghost.rotation);
+  const roofTool = getRoofTool(ghost.tool);
   const color = ghost.valid ? '#4FC3F7' : '#E74C3C';
+
+  // Mode atap: siluet bentuk piece di atas tembok
+  if (roofTool) {
+    return <RoofGhost ghost={ghost} />;
+  }
+
+  const fp = pieceFootprint(tool.kind, tool.size, ghost.rotation);
 
   if (tool.kind === 'floor') {
     return (
@@ -132,8 +172,31 @@ function PlacementPlane({
 
     const state = useHouseStore.getState();
 
-    // Mode bangun: ghost piece lantai/tembok
+    // Mode atap: piece mengikuti grid; wajib cell ber-tembok
     if (buildTool) {
+      const roofTool = getRoofTool(buildTool);
+      if (roofTool) {
+        const fp = pieceFootprint(roofTool.kind, roofTool.size, buildRotation);
+        const [x, z] = snapPieceCenter(e.point.x, e.point.z, fp);
+        const pos = [x, 0, z];
+        const valid =
+          isPieceWithinPlot(pos, fp) &&
+          !collidesWithPieces(pos, roofTool.kind, roofTool.size, buildRotation, state.buildPieces) &&
+          isRoofPlacementValid(pos, fp, state.buildPieces);
+        setGhost({
+          tool: buildTool,
+          x,
+          z,
+          size: roofTool.size,
+          model: roofTool.model,
+          rotation: buildRotation,
+          baseY: roofPieceBaseY(pos, fp, state.buildPieces),
+          valid,
+        });
+        return;
+      }
+
+      // Mode bangun: ghost piece lantai/tembok
       const tool = getBuildTool(buildTool);
       const fp = pieceFootprint(tool.kind, tool.size, buildRotation);
       const [x, z] = snapPieceCenter(e.point.x, e.point.z, fp);
@@ -199,12 +262,20 @@ function PlacementPlane({
     e.stopPropagation();
     const point = e.point;
 
-    // Mode bangun: pasang piece
+    // Mode bangun: pasang piece (lantai / tembok / atap)
     if (buildTool) {
-      const tool = getBuildTool(buildTool);
+      const tool = getBuildTool(buildTool) || getRoofTool(buildTool);
       const fp = pieceFootprint(tool.kind, tool.size, buildRotation);
       const [x, z] = snapPieceCenter(point.x, point.z, fp);
-      useHouseStore.getState().addPiece(tool.kind, tool.size, buildRotation, [x, 0, z]);
+      useHouseStore
+        .getState()
+        .addPiece(
+          tool.kind,
+          tool.size,
+          buildRotation,
+          [x, 0, z],
+          tool.kind === 'roof' ? tool.model : null
+        );
       return;
     }
 
@@ -277,12 +348,15 @@ export function EditorView() {
   const [buildRotation, setBuildRotation] = useState('h');
   // Sidebar drawer (hanya efek di layar <768px; desktop selalu terbuka via CSS)
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Modal konfirmasi reset ke default
+  const [showResetModal, setShowResetModal] = useState(false);
   const orbitControlsRef = useRef();
   const furnitureItems = useHouseStore((state) => state.furnitureItems);
   const buildPieces = useHouseStore((state) => state.buildPieces);
   const updateFurniture = useHouseStore((state) => state.updateFurniture);
   const removeFurniture = useHouseStore((state) => state.removeFurniture);
   const removePiece = useHouseStore((state) => state.removePiece);
+  const resetToDefault = useHouseStore((state) => state.resetToDefault);
 
   const [removeBlockedMsg, setRemoveBlockedMsg] = useState(null);
 
@@ -441,6 +515,28 @@ export function EditorView() {
 
   const floorCount = buildPieces.filter((p) => p.kind === 'floor').length;
   const wallCount = buildPieces.filter((p) => p.kind === 'wall').length;
+  const roofCount = buildPieces.filter((p) => p.kind === 'roof').length;
+
+  const handleResetAll = () => {
+    resetToDefault();
+    setSelectedItemId(null);
+    setSelectedType(null);
+    setSelectedPieceId(null);
+    setHoverColor(null);
+    setBuildTool(null);
+    setRemoveBlockedMsg(null);
+    setShowResetModal(false);
+  };
+
+  // Esc menutup modal konfirmasi reset
+  useEffect(() => {
+    if (!showResetModal) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setShowResetModal(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showResetModal]);
 
   return (
     <div className="editor-view" onContextMenu={(e) => e.preventDefault()}>
@@ -548,6 +644,22 @@ export function EditorView() {
           </span>
           <h1>Editor Isi Rumah</h1>
         </div>
+        <button type="button" className="reset-btn" onClick={() => setShowResetModal(true)}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="reset-btn-icon"
+          >
+            <path d="M3 12a9 9 0 1 0 3-6.7" />
+            <path d="M3 4.5V10h5.5" />
+          </svg>
+          Reset
+        </button>
         <a href="/" className="back-btn">
           <svg
             viewBox="0 0 24 24"
@@ -578,7 +690,7 @@ export function EditorView() {
       {selectedPieceId && (
         <div className="editor-controls">
           <p className="piece-selected-hint">
-            Tembok / lantai terpilih (kuning)
+            Tembok / lantai / atap terpilih (kuning)
           </p>
           <button onClick={handleRemovePiece} className="remove-btn piece-remove-btn">
             Bongkar Piece
@@ -588,9 +700,17 @@ export function EditorView() {
 
       <div className="editor-stats">
         <p>Total Furniture: {furnitureItems.length}</p>
-        <p>Lantai: {floorCount} ubin • Tembok: {wallCount} seksi</p>
+        <p>
+          Lantai: {floorCount} ubin • Tembok: {wallCount} seksi • Atap: {roofCount} piece
+        </p>
         {selectedType && <p>📍 Klik lantai untuk menempatkan "{furnitureCatalog.find(f => f.type === selectedType)?.label}" • Siluet mengikuti kursor</p>}
-        {buildTool && <p>🔨 Klik tanah untuk memasang piece • Tembok menumpuk otomatis & tidak menembus furniture • Klik kanan untuk batal</p>}
+        {buildTool && (
+          <p>
+            {getRoofTool(buildTool)
+              ? '🏠 Klik di atas tembok untuk memasang piece atap • Arah lereng via tombol Arah • Klik kanan untuk batal'
+              : '🔨 Klik tanah untuk memasang piece • Tembok menumpuk otomatis & tidak menembus furniture • Klik kanan untuk batal'}
+          </p>
+        )}
         {selectedItemId && <p>✓ Drag untuk pindah, tombol putar untuk rotasi • Klik area kosong untuk batal pilih</p>}
         {selectedPieceId && <p>🧱 Klik kanan piece yang sama atau tombol "Bongkar Piece" untuk menghapus • Klik area lain untuk batal pilih</p>}
         {removeBlockedMsg && selectedPieceId && (
@@ -600,6 +720,56 @@ export function EditorView() {
           <p className="collision-warning">⚠ Tidak bisa di posisi ini (tabrakan / di luar lantai / menembus tembok)</p>
         )}
       </div>
+
+      {/* ===== Modal konfirmasi reset ke default ===== */}
+      {showResetModal && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setShowResetModal(false)}
+          role="presentation"
+        >
+          <div
+            className="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="modal-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 3.5 21 19.5H3z" />
+                <path d="M12 10v4.5" />
+                <path d="M12 17.2v.3" />
+              </svg>
+            </span>
+            <h3 id="reset-modal-title">Kembalikan ke Default?</h3>
+            <p>
+              Seluruh furniture dan piece bangunan (lantai, tembok, atap)
+              akan dihapus, lantai kembali ke ubin default 8×8. Tindakan ini
+              tidak bisa dibatalkan.
+            </p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="modal-btn-ghost"
+                onClick={() => setShowResetModal(false)}
+              >
+                Batal
+              </button>
+              <button type="button" className="modal-btn-danger" onClick={handleResetAll}>
+                Ya, Reset Semua
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
